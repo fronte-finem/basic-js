@@ -16,10 +16,5 @@ module.exports = function repeater(str, options) {
 
 function repeat(any, times, sep) {
   str = String(any);
-  let res = [str];
-  for (let i=1; i < times; i++) {
-    res.push(sep);
-    res.push(str)
-  }
-  return res.join('');
+  return times < 2 ? str : Array(times - 1).fill(str + sep).join('') + str;
 };
