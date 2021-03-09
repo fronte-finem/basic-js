@@ -8,6 +8,8 @@ const X2_PREV = '--double-prev';
 const notDiscarded = (arr, i) => i >= 0 && i < arr.length && arr[i] !== NOT_NEXT;
 
 module.exports = function transform(arr) {
+  if(!Array.isArray(arr)) throw new Error(`Given argument is not array! => ${arr}`);
+
   let res = [];
 
   for (let i = 0; i < arr.length; i++) {
