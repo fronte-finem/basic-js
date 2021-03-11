@@ -10,13 +10,13 @@ const latinFiniteMonoid = (x, i) => String.fromCharCode((x.charCodeAt() + i - _A
 
 const LATIN = Array(LATIN_AMOUNT).fill('A').map(latinFiniteMonoid);
 
-const genTabulaRecta = (record) => LATIN.reduce((acc, x, i) => {
-  acc[x] = LATIN.reduce((o,x) => record(o,x,i), {});
+const genTabulaRecta = (update) => LATIN.reduce((acc, x, i) => {
+  acc[x] = LATIN.reduce((o, y) => update(o, y, latinFiniteMonoid(y, i)), {});
   return acc
 }, {});
 
-const EncTabulaRecta = genTabulaRecta((o,x,i) => { o[x] = latinFiniteMonoid(x,i); return o });
-const DecTabulaRecta = genTabulaRecta((o,x,i) => { o[latinFiniteMonoid(x,i)] = x; return o });
+const EncTabulaRecta = genTabulaRecta((o, a, b) => { o[a] = b; return o });
+const DecTabulaRecta = genTabulaRecta((o, a, b) => { o[b] = a; return o });
 
 
 function* repeat(xs) { while(true) for (let x of xs) yield x; }
