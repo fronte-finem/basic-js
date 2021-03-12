@@ -1,28 +1,34 @@
 const CustomError = require("../extensions/custom-error");
 
+const isString = (x) => typeof x == "string" || x instanceof String;
 
-const _A_ = 'A'.charCodeAt();
+const _A_ = "A".charCodeAt();
 const LATIN_AMOUNT = 26;
 
-const isString = (x) => typeof x == 'string' || x instanceof String;
+const getLatChar = (i) => String.fromCharCode(_A_ + (i % LATIN_AMOUNT));
 
-const latinFiniteMonoid = (x, i) => String.fromCharCode((x.charCodeAt() + i - _A_) % LATIN_AMOUNT + _A_);
+const genTabulaRecta = (update) => {
+  let out = {};
+  for (let i = 0; i < LATIN_AMOUNT; i++) {
+    let key = getLatChar(i);
+    let inn = {};
+    for (let j = 0; j < LATIN_AMOUNT; j++) {
+      update(inn, getLatChar(i + j), getLatChar(j));
+    }
+    out[key] = inn;
+  }
+  return out;
+};
 
-const LATIN = Array(LATIN_AMOUNT).fill('A').map(latinFiniteMonoid);
+const EncTabulaRecta = genTabulaRecta((obj, a, b) => { obj[b] = a; return obj; });
+const DecTabulaRecta = genTabulaRecta((obj, a, b) => { obj[a] = b; return obj; });
 
-const genTabulaRecta = (update) => LATIN.reduce((acc, x, i) => {
-  acc[x] = LATIN.reduce((o, y) => update(o, y, latinFiniteMonoid(y, i)), {});
-  return acc
-}, {});
-
-const EncTabulaRecta = genTabulaRecta((o, a, b) => { o[a] = b; return o });
-const DecTabulaRecta = genTabulaRecta((o, a, b) => { o[b] = a; return o });
-
-
-function* repeat(xs) { while(true) for (let x of xs) yield x; }
+function* repeat(xs) {
+  while (true) for (let x of xs) yield x;
+}
 
 class VigenereCipheringMachine {
-  constructor(direct=true) {
+  constructor(direct = true) {
     this.direct = direct;
   }
 
@@ -34,13 +40,16 @@ class VigenereCipheringMachine {
     msg = msg.toUpperCase();
     const genKey = repeat(key.toUpperCase());
 
-    let res = msg.split('').map(x => x < 'A' || x > 'Z' ? x : tabulaRecta[genKey.next().value][x]);
+    let res = msg
+      .split("")
+      .map((x) => x < "A" || x > "Z" ? x : tabulaRecta[genKey.next().value][x]);
 
-    return this.direct ? res.join('') : res.reverse().join('');
+    return this.direct ? res.join("") : res.reverse().join("");
   }
 
   validate(msg, key) {
-    if (!isString(msg) || !isString(key)) throw new Error('Params must be string!');
+    if (!isString(msg) || !isString(key))
+      throw new Error("Params must be string!");
   }
 }
 
